@@ -1,0 +1,17 @@
+{
+  "name": "Workout Tracker",
+  "short_name": "Workout",
+  "description": "Offline-first workout tracker that stores your progress on your device.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#071107",
+  "theme_color": "#071107",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
