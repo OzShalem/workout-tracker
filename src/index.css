@@ -32,6 +32,7 @@
 
 html {
   min-height: 100%;
+  background: #071107;
 }
 
 body {
@@ -63,12 +64,16 @@ a {
 
 #root {
   min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(63, 255, 74, 0.14), transparent 20%),
+    linear-gradient(180deg, #081208 0%, #071107 28%, #081608 100%);
 }
 
 .app-shell {
   margin: 0 auto;
   width: min(100%, 430px);
   min-height: 100vh;
+  min-height: 100svh;
   background:
     radial-gradient(circle at top right, rgba(38, 255, 95, 0.12), transparent 24%),
     linear-gradient(180deg, rgba(8, 22, 8, 0.96), rgba(5, 15, 6, 0.99));
@@ -79,7 +84,7 @@ a {
 
 .app-main {
   flex: 1;
-  padding-bottom: 104px;
+  padding-bottom: 118px;
 }
 
 .screen {
@@ -91,6 +96,7 @@ a {
 
 .screen-center {
   min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -567,19 +573,19 @@ select.input {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 4px;
-  padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
+  padding: 14px 10px calc(16px + env(safe-area-inset-bottom));
   background: rgba(6, 16, 7, 0.92);
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .tabbar-link {
-  min-height: 50px;
+  min-height: 58px;
   display: grid;
   place-items: center;
   border-radius: 18px;
   color: #779078;
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   text-align: center;
 }
 
