@@ -13,7 +13,17 @@ function downloadTextFile(filename: string, content: string) {
 }
 
 export function SettingsPage() {
-  const { db, setDisplayName, updateSettings, updateLanguage, updateUnitSystem, importBackup, resetApp } =
+  const {
+    db,
+    needsRepair,
+    setDisplayName,
+    updateSettings,
+    updateLanguage,
+    updateUnitSystem,
+    repairLocalData,
+    importBackup,
+    resetApp,
+  } =
     useAppState()
   const { t, language } = useI18n()
 
@@ -80,6 +90,12 @@ export function SettingsPage() {
             >
               PL
             </button>
+            <button
+              className={db.user.language === 'uk' ? 'segment segment-active' : 'segment'}
+              onClick={() => void updateLanguage('uk')}
+            >
+              UA
+            </button>
           </div>
         </div>
       </div>
@@ -130,6 +146,17 @@ export function SettingsPage() {
           <h2>{t('data')}</h2>
         </div>
         <div className="stack compact-stack">
+          <button
+            className="button button-secondary"
+            disabled={!needsRepair}
+            onClick={() => void repairLocalData()}
+          >
+            {language === 'pl'
+              ? 'Napraw dane lokalne'
+              : language === 'uk'
+                ? 'Відновити локальні дані'
+                : 'Repair local data'}
+          </button>
           <button className="button button-secondary" onClick={handleExport}>
             {t('exportJsonBackup')}
           </button>

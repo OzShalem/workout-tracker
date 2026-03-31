@@ -73,7 +73,16 @@ export function ActiveWorkoutPage() {
         entry.id === exerciseEntryId
           ? {
               ...entry,
-              sets: entry.sets.map((set) => (set.id === setId ? { ...set, ...patch } : set)),
+              sets: entry.sets.map((set) => {
+                if (set.id !== setId) return set
+                const nextSet = { ...set, ...patch }
+                return {
+                  ...nextSet,
+                  isCompleted:
+                    typeof nextSet.reps === 'number' ||
+                    typeof nextSet.weight === 'number',
+                }
+              }),
             }
           : entry,
       ),
@@ -179,7 +188,7 @@ export function ActiveWorkoutPage() {
                 <span>Set</span>
                 <span>Weight</span>
                 <span>Reps</span>
-                <span>Done</span>
+                <span>Status</span>
               </div>
               {entry.sets.map((set, setIndex) => (
                 <div className="set-row" key={set.id}>
@@ -202,16 +211,9 @@ export function ActiveWorkoutPage() {
                       void handleUpdateSet(entry.id, set.id, { reps: toInputNumber(event.target.value) })
                     }
                   />
-                  <label className="checkbox">
-                    <input
-                      type="checkbox"
-                      checked={set.isCompleted}
-                      onChange={(event) =>
-                        void handleUpdateSet(entry.id, set.id, { isCompleted: event.target.checked })
-                      }
-                    />
-                    <span />
-                  </label>
+                  <span className={set.isCompleted || set.reps || set.weight ? 'status-complete' : 'status-muted'}>
+                    {set.isCompleted || set.reps || set.weight ? t('completed') : t('skipped')}
+                  </span>
                 </div>
               ))}
             </div>

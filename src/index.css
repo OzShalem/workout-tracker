@@ -402,6 +402,12 @@ select.input {
     linear-gradient(180deg, rgba(16, 42, 18, 0.98), rgba(11, 27, 13, 0.99));
 }
 
+.widget-card-coach {
+  background:
+    radial-gradient(circle at top right, rgba(157, 255, 122, 0.14), transparent 26%),
+    linear-gradient(180deg, rgba(14, 34, 18, 0.98), rgba(10, 24, 13, 0.99));
+}
+
 .empty-panel {
   text-align: center;
 }
@@ -526,6 +532,11 @@ select.input {
   padding: 12px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-md);
+}
+
+.drag-hint {
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .segmented {
@@ -689,6 +700,25 @@ select.input {
   gap: 10px;
 }
 
+.progress-widget-grid {
+  grid-template-columns: 1fr;
+}
+
+.numbers-stack {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.numbers-stack strong {
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.numbers-stack p {
+  font-size: 0.76rem;
+}
+
 .glance-card {
   background: var(--bg-soft);
   border-radius: var(--radius-md);
@@ -815,6 +845,14 @@ select.input {
 @media (min-width: 420px) {
   .metric-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .progress-widget-grid {
+    grid-template-columns: 1.2fr 1fr;
+  }
+
+  .progress-widget-grid > :last-child {
+    grid-column: 1 / -1;
   }
 
   .last-workout-grid {

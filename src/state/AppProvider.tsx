@@ -7,7 +7,7 @@ import {
   type PropsWithChildren,
 } from 'react'
 import { createDefaultDb } from '../db/defaultDb'
-import { importDb, loadDb, resetDb, saveDb } from '../db/storage'
+import { importDb, loadDbWithStatus, repairDb, resetDb, saveDb } from '../db/storage'
 import {
   createEmptySession,
   createWorkoutSet,
@@ -25,6 +25,7 @@ import type {
 type AppContextValue = {
   db: Db
   isLoading: boolean
+  needsRepair: boolean
   setDisplayName: (name: string) => Promise<void>
   startEmptyWorkout: () => Promise<WorkoutSession>
   startWorkoutFromRoutine: (routineId: ID) => Promise<WorkoutSession | null>
@@ -43,6 +44,7 @@ type AppContextValue = {
   updateSettings: (patch: Partial<Db['settings']>) => Promise<void>
   updateLanguage: (language: Db['user']['language']) => Promise<void>
   updateUnitSystem: (unitSystem: Db['user']['unitSystem']) => Promise<void>
+  repairLocalData: () => Promise<void>
   importBackup: (json: string) => Promise<void>
   resetApp: () => Promise<void>
 }
@@ -52,10 +54,14 @@ const AppContext = createContext<AppContextValue | null>(null)
 export function AppProvider({ children }: PropsWithChildren) {
   const [db, setDb] = useState<Db>(createDefaultDb())
   const [isLoading, setIsLoading] = useState(true)
+  const [needsRepair, setNeedsRepair] = useState(false)
 
   useEffect(() => {
-    loadDb()
-      .then((loaded) => setDb(loaded))
+    loadDbWithStatus()
+      .then(({ db: loaded, neededRepair }) => {
+        setDb(loaded)
+        setNeedsRepair(neededRepair)
+      })
       .finally(() => setIsLoading(false))
   }, [])
 
@@ -68,6 +74,7 @@ export function AppProvider({ children }: PropsWithChildren) {
     () => ({
       db,
       isLoading,
+      needsRepair,
       async setDisplayName(name) {
         const nextDb = {
           ...db,
@@ -245,6 +252,11 @@ export function AppProvider({ children }: PropsWithChildren) {
         }
         await commit(nextDb)
       },
+      async repairLocalData() {
+        const repaired = await repairDb()
+        setDb(repaired)
+        setNeedsRepair(false)
+      },
       async importBackup(json) {
         const imported = await importDb(json)
         setDb(imported)
@@ -254,7 +266,7 @@ export function AppProvider({ children }: PropsWithChildren) {
         setDb(fresh)
       },
     }),
-    [db, isLoading],
+    [db, isLoading, needsRepair],
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

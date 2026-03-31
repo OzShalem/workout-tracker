@@ -1,3 +1,5 @@
+import { motion } from 'motion/react'
+
 type Datum = {
   label: string
   value: number
@@ -34,15 +36,23 @@ export function LineChart({
     .join(' ')
 
   return (
-    <div className="chart-shell">
+    <motion.div
+      className="chart-shell"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+    >
       <svg viewBox={`0 0 ${width} ${height}`} className="chart-svg" preserveAspectRatio="none">
-        <polyline
+        <motion.polyline
           fill="none"
           stroke={color}
           strokeWidth="4"
           strokeLinejoin="round"
           strokeLinecap="round"
           points={points}
+          initial={{ pathLength: 0, opacity: 0.3 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
         />
       </svg>
       <div className="chart-labels">
@@ -50,7 +60,7 @@ export function LineChart({
           <span key={item.label}>{item.label}</span>
         ))}
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -71,9 +81,12 @@ export function BarChart({
     <div className="bar-chart">
       {data.map((item) => (
         <div className="bar-column" key={item.label}>
-          <div
+          <motion.div
             className="bar-fill"
             style={{ height: `${Math.max(12, (item.value / max) * 100)}%`, background: color }}
+            initial={{ scaleY: 0.2, opacity: 0.35 }}
+            animate={{ scaleY: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
           />
           <span>{item.label}</span>
         </div>

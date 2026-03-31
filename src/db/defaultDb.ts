@@ -47,6 +47,10 @@ export const seedRoutines: RoutineTemplate[] = [
 ]
 
 export function detectPreferredLanguage(): Db['user']['language'] {
+  if (typeof navigator !== 'undefined' && navigator.language.toLowerCase().startsWith('uk')) {
+    return 'uk'
+  }
+
   return typeof navigator !== 'undefined' && navigator.language.toLowerCase().startsWith('pl')
     ? 'pl'
     : 'en'

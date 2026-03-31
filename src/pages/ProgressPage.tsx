@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { motion } from 'motion/react'
 import { BarChart, LineChart } from '../components/Charts'
 import {
   getBodyweightSeries,
@@ -28,6 +29,14 @@ export function ProgressPage() {
   const latestBodyMetric = getLatestBodyMetric(db)
   const weeklyVolume = Math.round(getWeeklyVolume(db))
   const weeklyCount = getWeeklyWorkoutCount(db)
+  const nextTarget = useMemo(() => {
+    const bestSet = progress.bestSession?.bestSet
+    if (!bestSet?.weight) return '--'
+    const suggestedWeight = typeof bestSet.reps === 'number' && bestSet.reps >= 8
+      ? bestSet.weight + 2.5
+      : bestSet.weight
+    return `${suggestedWeight}${db.user.unitSystem === 'metric' ? 'kg' : 'lb'}`
+  }, [db.user.unitSystem, progress.bestSession])
 
   async function handleAddBodyWeight(event: FormEvent) {
     event.preventDefault()
@@ -49,17 +58,72 @@ export function ProgressPage() {
         </div>
       </header>
 
-      <div className="progress-hero-grid">
-        <article className="widget-card widget-card-hero">
+      <div className="progress-hero-grid progress-widget-grid">
+        <motion.article
+          className="widget-card widget-card-hero"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28 }}
+        >
           <span className="eyebrow">{t('momentum')}</span>
           <strong>{progress.bestSession?.bestSet ? Math.round(getEstimated1Rm(progress.bestSession.bestSet)) : '--'}</strong>
-          <p className="muted">Best projected 1RM for the selected lift.</p>
-        </article>
-        <article className="widget-card">
+          <p className="muted">
+            {t('bestEstimated1Rm')} · {t('exercise')}
+          </p>
+          <LineChart
+            data={progress.sessions
+              .slice(0, 6)
+              .reverse()
+              .map((session) => ({
+                label: new Date(session.workout.startedAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                }),
+                value: Math.round(session.e1rm),
+              }))}
+          />
+        </motion.article>
+
+        <motion.article
+          className="widget-card"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.34 }}
+        >
           <span className="eyebrow">{t('volume')}</span>
-          <strong>{weeklyVolume}</strong>
-          <p className="muted">{weeklyCount} sessions in the last 7 days.</p>
-        </article>
+          <div className="numbers-stack">
+            <div>
+              <strong>{weeklyVolume}</strong>
+              <p className="muted">{t('volume')}</p>
+            </div>
+            <div>
+              <strong>{weeklyCount}</strong>
+              <p className="muted">{t('totalSessions')}</p>
+            </div>
+            <div>
+              <strong>{latestBodyMetric?.bodyWeight ?? '--'}</strong>
+              <p className="muted">{t('currentWeight')}</p>
+            </div>
+          </div>
+        </motion.article>
+
+        <motion.article
+          className="widget-card widget-card-coach"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <span className="eyebrow">Coach</span>
+          <strong>{nextTarget}</strong>
+          <p className="muted">
+            {db.user.language === 'pl'
+              ? 'Następny cel dla tego ćwiczenia.'
+              : db.user.language === 'uk'
+                ? 'Наступна ціль для цієї вправи.'
+                : 'Suggested next target for this lift.'}
+          </p>
+          <BarChart data={volumeSeries.slice(-5)} color="linear-gradient(180deg, #8cff5a, #16cd30)" />
+        </motion.article>
       </div>
 
       <div className="panel">
@@ -79,28 +143,17 @@ export function ProgressPage() {
         </label>
       </div>
 
-      <div className="metric-grid metric-grid-compact">
-        <article className="metric-card">
-          <span>{t('bestEstimated1Rm')}</span>
-          <strong>
-            {progress.bestSession?.bestSet ? Math.round(getEstimated1Rm(progress.bestSession.bestSet)) : '--'}
-          </strong>
-        </article>
-        <article className="metric-card">
-          <span>{t('totalSessions')}</span>
-          <strong>{progress.totalSessions}</strong>
-        </article>
-        <article className="metric-card">
-          <span>{t('currentWeight')}</span>
-          <strong>{latestBodyMetric?.bodyWeight ?? '--'}</strong>
-        </article>
-      </div>
-
       <div className="panel">
         <div className="section-heading">
           <div>
             <h2>{t('momentum')}</h2>
-            <p className="muted">Use these widgets as your quick-read training dashboard.</p>
+            <p className="muted">
+              {db.user.language === 'pl'
+                ? 'Szybki odczyt Twojego postępu.'
+                : db.user.language === 'uk'
+                  ? 'Швидкий огляд твого прогресу.'
+                  : 'Quick read on your training momentum.'}
+            </p>
           </div>
         </div>
         <LineChart
@@ -120,7 +173,13 @@ export function ProgressPage() {
       <div className="panel">
         <div className="section-heading">
           <h2>{t('volumeFlow')}</h2>
-          <span className="muted">Recent load by session</span>
+          <span className="muted">
+            {db.user.language === 'pl'
+              ? 'Ostatnie obciążenie sesji'
+              : db.user.language === 'uk'
+                ? 'Останнє навантаження по сесіях'
+                : 'Recent load by session'}
+          </span>
         </div>
         <BarChart data={volumeSeries} />
       </div>
@@ -155,7 +214,14 @@ export function ProgressPage() {
       <div className="panel">
         <div className="section-heading">
           <h2>{t('bodyweight')}</h2>
-          <span className="muted">{db.bodyMetrics.length} entries</span>
+          <span className="muted">
+            {db.bodyMetrics.length}{' '}
+            {db.user.language === 'pl'
+              ? 'wpisów'
+              : db.user.language === 'uk'
+                ? 'записів'
+                : 'entries'}
+          </span>
         </div>
         <form className="inline-form inline-form-weights" onSubmit={handleAddBodyWeight}>
           <input
@@ -169,7 +235,11 @@ export function ProgressPage() {
         </form>
         {latestBodyMetric ? (
           <p className="muted">
-            Latest check-in: {latestBodyMetric.bodyWeight} on {latestBodyMetric.date}
+            {db.user.language === 'pl'
+              ? `Ostatni pomiar: ${latestBodyMetric.bodyWeight} dnia ${latestBodyMetric.date}`
+              : db.user.language === 'uk'
+                ? `Останній запис: ${latestBodyMetric.bodyWeight} за ${latestBodyMetric.date}`
+                : `Latest check-in: ${latestBodyMetric.bodyWeight} on ${latestBodyMetric.date}`}
           </p>
         ) : (
           <p className="muted">{t('noWeighInsYet')}</p>

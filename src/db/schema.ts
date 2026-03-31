@@ -1,5 +1,5 @@
 export type ID = string
-export type Language = 'en' | 'pl'
+export type Language = 'en' | 'pl' | 'uk'
 
 export type UnitSystem = 'metric' | 'imperial'
 

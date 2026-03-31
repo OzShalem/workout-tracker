@@ -43,29 +43,40 @@ function withSeeds(db: Db): Db {
 }
 
 export async function loadDb(): Promise<Db> {
+  return (await loadDbWithStatus()).db
+}
+
+export async function loadDbWithStatus(): Promise<{ db: Db; neededRepair: boolean }> {
   const store = await getStore()
   const value = await store.get(STORE_NAME, APP_KEY)
 
   if (!value) {
     const fresh = createDefaultDb()
     await saveDb(fresh)
-    return fresh
+    return { db: fresh, neededRepair: false }
   }
 
   if (!isValidDb(value)) {
     console.warn('Stored workout DB was invalid. Recreating default DB.')
     const fallback = createDefaultDb()
     await saveDb(fallback)
-    return fallback
+    return { db: fallback, neededRepair: false }
   }
 
   const hydrated = withSeeds(value)
+  const neededRepair = JSON.stringify(hydrated) !== JSON.stringify(value)
 
-  if (JSON.stringify(hydrated) !== JSON.stringify(value)) {
+  if (neededRepair) {
     await saveDb(hydrated)
   }
 
-  return hydrated
+  return { db: hydrated, neededRepair }
+}
+
+export async function repairDb(): Promise<Db> {
+  const db = await loadDb()
+  await saveDb(db)
+  return db
 }
 
 export async function saveDb(db: Db): Promise<void> {

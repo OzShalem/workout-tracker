@@ -8,6 +8,14 @@ import type {
   WorkoutSet,
 } from './schema'
 
+export function isSetLogged(set: WorkoutSet) {
+  return (
+    set.isCompleted ||
+    typeof set.reps === 'number' ||
+    typeof set.weight === 'number'
+  )
+}
+
 export function getExercise(db: Db, exerciseId: ID): ExerciseDef | undefined {
   return db.exercises.find((exercise) => exercise.id === exerciseId)
 }
@@ -28,7 +36,7 @@ export function getSessionDurationMinutes(workout: WorkoutSession): number | nul
 }
 
 export function getSetVolume(set: WorkoutSet): number {
-  if (!set.isCompleted || typeof set.reps !== 'number' || typeof set.weight !== 'number') return 0
+  if (!isSetLogged(set) || typeof set.reps !== 'number' || typeof set.weight !== 'number') return 0
   return set.reps * set.weight
 }
 
@@ -41,13 +49,13 @@ export function getWorkoutVolume(workout: WorkoutSession): number {
 }
 
 export function getEstimated1Rm(set: WorkoutSet): number {
-  if (!set.isCompleted || typeof set.weight !== 'number' || typeof set.reps !== 'number') return 0
+  if (!isSetLogged(set) || typeof set.weight !== 'number' || typeof set.reps !== 'number') return 0
   return set.weight * (1 + set.reps / 30)
 }
 
 export function getBestSet(entry: WorkoutExerciseEntry): WorkoutSet | undefined {
   return [...entry.sets]
-    .filter((set) => set.isCompleted && typeof set.weight === 'number' && typeof set.reps === 'number')
+    .filter((set) => isSetLogged(set) && typeof set.weight === 'number' && typeof set.reps === 'number')
     .sort((a, b) => getEstimated1Rm(b) - getEstimated1Rm(a))[0]
 }
 

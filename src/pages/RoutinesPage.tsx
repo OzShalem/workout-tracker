@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { Reorder } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 import { Modal } from '../components/Modal'
 import { getExercise } from '../db/selectors'
@@ -157,9 +158,19 @@ export function RoutinesPage() {
               />
             </label>
 
-            <div className="stack compact-stack">
-              {draft.exerciseBlocks.map((block, index) => (
-                <div className="editor-row" key={block.id}>
+            <Reorder.Group
+              axis="y"
+              values={draft.exerciseBlocks}
+              onReorder={(next) =>
+                setDraft({
+                  ...draft,
+                  exerciseBlocks: next.map((item, itemIndex) => ({ ...item, order: itemIndex })),
+                })
+              }
+              className="stack compact-stack reorder-group"
+            >
+              {draft.exerciseBlocks.map((block) => (
+                <Reorder.Item className="editor-row" key={block.id} value={block}>
                   <select
                     className="input"
                     value={block.exerciseId}
@@ -208,47 +219,16 @@ export function RoutinesPage() {
                   >
                     {t('remove')}
                   </button>
-                  <div className="inline-actions">
-                    <button
-                      type="button"
-                      className="icon-button"
-                      disabled={index === 0}
-                      onClick={() => {
-                        const next = [...draft.exerciseBlocks]
-                        ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-                        setDraft({
-                          ...draft,
-                          exerciseBlocks: next.map((item, itemIndex) => ({
-                            ...item,
-                            order: itemIndex,
-                          })),
-                        })
-                      }}
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      className="icon-button"
-                      disabled={index === draft.exerciseBlocks.length - 1}
-                      onClick={() => {
-                        const next = [...draft.exerciseBlocks]
-                        ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
-                        setDraft({
-                          ...draft,
-                          exerciseBlocks: next.map((item, itemIndex) => ({
-                            ...item,
-                            order: itemIndex,
-                          })),
-                        })
-                      }}
-                    >
-                      ↓
-                    </button>
+                  <div className="drag-hint">
+                    {db.user.language === 'pl'
+                      ? 'Przeciągnij, aby zmienić kolejność'
+                      : db.user.language === 'uk'
+                        ? 'Перетягни, щоб змінити порядок'
+                        : 'Drag to reorder'}
                   </div>
-                </div>
+                </Reorder.Item>
               ))}
-            </div>
+            </Reorder.Group>
 
             <button
               type="button"

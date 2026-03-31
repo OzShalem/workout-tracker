@@ -6,9 +6,14 @@ import App from './App'
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     if (import.meta.env.PROD) {
-      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch((error) => {
-        console.warn('Service worker registration failed', error)
-      })
+      navigator.serviceWorker
+        .register(`${import.meta.env.BASE_URL}sw.js`)
+        .then((registration) => {
+          void registration.update()
+        })
+        .catch((error) => {
+          console.warn('Service worker registration failed', error)
+        })
       return
     }
 
