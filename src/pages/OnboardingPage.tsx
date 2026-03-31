@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { useAppState } from '../state/AppProvider'
+import { useI18n } from '../i18n/translations'
 
 export function OnboardingPage() {
   const { setDisplayName } = useAppState()
+  const { t } = useI18n()
   const [name, setName] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
@@ -17,13 +19,11 @@ export function OnboardingPage() {
   return (
     <div className="screen-center">
       <form className="hero-card" onSubmit={handleSubmit}>
-        <span className="eyebrow">First time setup</span>
-        <h1>What should this locker call you?</h1>
-        <p className="muted">
-          Your name stays on this device and makes the app feel like yours from day one.
-        </p>
+        <span className="eyebrow">{t('firstTimeSetup')}</span>
+        <h1>{t('onboardingTitle')}</h1>
+        <p className="muted">{t('onboardingBody')}</p>
         <label className="field">
-          <span>Name</span>
+          <span>{t('name')}</span>
           <input
             autoFocus
             className="input"
@@ -33,7 +33,7 @@ export function OnboardingPage() {
           />
         </label>
         <button className="button button-primary" disabled={!name.trim() || isSaving}>
-          {isSaving ? 'Saving...' : 'Enter Gym Mode'}
+          {isSaving ? t('saving') : t('enterGymMode')}
         </button>
       </form>
     </div>

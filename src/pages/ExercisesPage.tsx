@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Modal } from '../components/Modal'
 import type { ExerciseCategory, Equipment } from '../db/schema'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 
 const categories: ExerciseCategory[] = [
@@ -31,6 +32,7 @@ const equipmentOptions: Equipment[] = [
 
 export function ExercisesPage() {
   const { db, addExercise, updateExercise, deleteExercise } = useAppState()
+  const { t } = useI18n()
   const [query, setQuery] = useState('')
   const [name, setName] = useState('')
   const [category, setCategory] = useState<ExerciseCategory>('Other')
@@ -51,8 +53,8 @@ export function ExercisesPage() {
     <section className="screen">
       <header className="page-header">
         <div>
-          <span className="eyebrow">Exercises</span>
-          <h1>Your library</h1>
+          <span className="eyebrow">{t('tabExercises')}</span>
+          <h1>{t('exercisesTitle')}</h1>
         </div>
         <button className="button button-primary button-inline" onClick={() => setIsCreateOpen(true)}>
           +
@@ -61,7 +63,7 @@ export function ExercisesPage() {
 
       <div className="panel">
         <label className="field">
-          <span>Search exercises</span>
+          <span>{t('searchExercises')}</span>
           <input
             className="input"
             placeholder="Bench, squat, row..."
@@ -93,8 +95,8 @@ export function ExercisesPage() {
 
       {isCreateOpen ? (
         <Modal
-          title="Add exercise"
-          subtitle="Create a custom lift and add it to your private library."
+          title={t('addExercise')}
+          subtitle={t('addExerciseSubtitle')}
           onClose={() => setIsCreateOpen(false)}
         >
           <form
@@ -114,7 +116,7 @@ export function ExercisesPage() {
             }}
           >
             <label className="field">
-              <span>Name</span>
+              <span>{t('name')}</span>
               <input
                 className="input"
                 value={name}
@@ -123,7 +125,7 @@ export function ExercisesPage() {
               />
             </label>
             <label className="field">
-              <span>Category</span>
+              <span>{t('category')}</span>
               <select
                 className="input"
                 value={category}
@@ -137,7 +139,7 @@ export function ExercisesPage() {
               </select>
             </label>
             <label className="field">
-              <span>Equipment</span>
+              <span>{t('equipment')}</span>
               <select
                 className="input"
                 value={equipment}
@@ -156,9 +158,9 @@ export function ExercisesPage() {
                 className="button button-secondary"
                 onClick={() => setIsCreateOpen(false)}
               >
-                Cancel
+                {t('cancel')}
               </button>
-              <button className="button button-primary">Save exercise</button>
+              <button className="button button-primary">{t('saveExercise')}</button>
             </div>
           </form>
         </Modal>
@@ -166,13 +168,13 @@ export function ExercisesPage() {
 
       {editingExercise ? (
         <Modal
-          title="Edit exercise"
-          subtitle="Keep your library clean and consistent."
+          title={t('editExercise')}
+          subtitle={t('editExerciseSubtitle')}
           onClose={() => setEditingId(null)}
         >
           <div className="stack">
             <label className="field">
-              <span>Name</span>
+              <span>{t('name')}</span>
               <input
                 className="input"
                 value={editingExercise.name}
@@ -186,7 +188,7 @@ export function ExercisesPage() {
               />
             </label>
             <label className="field">
-              <span>Category</span>
+              <span>{t('category')}</span>
               <select
                 className="input"
                 value={editingExercise.category}
@@ -206,7 +208,7 @@ export function ExercisesPage() {
               </select>
             </label>
             <label className="field">
-              <span>Equipment</span>
+              <span>{t('equipment')}</span>
               <select
                 className="input"
                 value={editingExercise.equipment}
@@ -234,10 +236,10 @@ export function ExercisesPage() {
                   setEditingId(null)
                 }}
               >
-                Delete
+                {t('delete')}
               </button>
               <button className="button button-primary" onClick={() => setEditingId(null)}>
-                Done
+                {t('done')}
               </button>
             </div>
           </div>

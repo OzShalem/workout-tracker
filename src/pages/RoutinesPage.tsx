@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { Modal } from '../components/Modal'
 import { getExercise } from '../db/selectors'
 import type { RoutineTemplate } from '../db/schema'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 
 export function RoutinesPage() {
   const { db, saveRoutine, deleteRoutine, startWorkoutFromRoutine } = useAppState()
+  const { t } = useI18n()
   const navigate = useNavigate()
   const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null)
   const [draft, setDraft] = useState<RoutineTemplate | null>(null)
@@ -79,11 +81,11 @@ export function RoutinesPage() {
     <section className="screen">
       <header className="page-header">
         <div>
-          <span className="eyebrow">Routines</span>
-          <h1>Repeat what works</h1>
+          <span className="eyebrow">{t('tabRoutines')}</span>
+          <h1>{t('routinesTitle')}</h1>
         </div>
         <button className="button button-secondary button-inline" onClick={openCreateRoutine}>
-          + New
+          + {t('newRoutine')}
         </button>
       </header>
 
@@ -100,19 +102,19 @@ export function RoutinesPage() {
                   className="button button-secondary button-inline"
                   onClick={() => openEditRoutine(routine)}
                 >
-                  Edit
+                  {t('edit')}
                 </button>
                 <button
                   className="button button-danger button-inline"
                   onClick={() => void handleQuickDeleteRoutine(routine.id)}
                 >
-                  Delete
+                  {t('delete')}
                 </button>
                 <button
                   className="button button-primary button-inline"
                   onClick={() => handleStartRoutine(routine.id)}
                 >
-                  Start
+                  {t('start')}
                 </button>
               </div>
             </div>
@@ -130,8 +132,8 @@ export function RoutinesPage() {
 
       {draft ? (
         <Modal
-          title={editingRoutine ? 'Edit routine' : 'Create routine'}
-          subtitle="Build a repeatable session with real exercise blocks."
+          title={editingRoutine ? t('editRoutine') : t('createRoutine')}
+          subtitle={t('routineSubtitle')}
           onClose={() => {
             setEditingRoutineId(null)
             setDraft(null)
@@ -139,7 +141,7 @@ export function RoutinesPage() {
         >
           <form className="stack" onSubmit={handleSaveRoutine}>
             <label className="field">
-              <span>Name</span>
+              <span>{t('name')}</span>
               <input
                 className="input"
                 value={draft.name}
@@ -147,7 +149,7 @@ export function RoutinesPage() {
               />
             </label>
             <label className="field">
-              <span>Description</span>
+              <span>{t('description')}</span>
               <input
                 className="input"
                 value={draft.description ?? ''}
@@ -180,7 +182,7 @@ export function RoutinesPage() {
                     className="input"
                     inputMode="numeric"
                     value={block.suggestedSets ?? ''}
-                    placeholder="Sets"
+                    placeholder={t('sets')}
                     onChange={(event) =>
                       setDraft({
                         ...draft,
@@ -204,7 +206,7 @@ export function RoutinesPage() {
                       })
                     }
                   >
-                    Remove
+                    {t('remove')}
                   </button>
                   <div className="inline-actions">
                     <button
@@ -268,16 +270,16 @@ export function RoutinesPage() {
                 })
               }
             >
-              Add exercise block
+              {t('addExerciseBlock')}
             </button>
 
             <div className="modal-actions">
               {editingRoutine ? (
                 <button type="button" className="button button-danger" onClick={handleDeleteRoutine}>
-                  Delete routine
+                  {t('delete')}
                 </button>
               ) : null}
-              <button className="button button-primary">Save routine</button>
+              <button className="button button-primary">{t('saveRoutine')}</button>
             </div>
           </form>
         </Modal>

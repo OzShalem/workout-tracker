@@ -9,10 +9,12 @@ import {
   getWeeklyVolume,
   getWeeklyWorkoutCount,
 } from '../db/selectors'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 
 export function ProgressPage() {
   const { db, addBodyMetric } = useAppState()
+  const { t } = useI18n()
   const [selectedExerciseId, setSelectedExerciseId] = useState(db.exercises[0]?.id ?? '')
   const [bodyWeight, setBodyWeight] = useState('')
 
@@ -42,19 +44,19 @@ export function ProgressPage() {
     <section className="screen">
       <header className="page-header">
         <div>
-          <span className="eyebrow">Progress</span>
-          <h1>Strength & trends</h1>
+          <span className="eyebrow">{t('tabProgress')}</span>
+          <h1>{t('progressTitle')}</h1>
         </div>
       </header>
 
       <div className="progress-hero-grid">
         <article className="widget-card widget-card-hero">
-          <span className="eyebrow">Performance</span>
+          <span className="eyebrow">{t('momentum')}</span>
           <strong>{progress.bestSession?.bestSet ? Math.round(getEstimated1Rm(progress.bestSession.bestSet)) : '--'}</strong>
           <p className="muted">Best projected 1RM for the selected lift.</p>
         </article>
         <article className="widget-card">
-          <span className="eyebrow">Weekly volume</span>
+          <span className="eyebrow">{t('volume')}</span>
           <strong>{weeklyVolume}</strong>
           <p className="muted">{weeklyCount} sessions in the last 7 days.</p>
         </article>
@@ -62,7 +64,7 @@ export function ProgressPage() {
 
       <div className="panel">
         <label className="field">
-          <span>Exercise</span>
+          <span>{t('exercise')}</span>
           <select
             className="input"
             value={selectedExerciseId}
@@ -79,17 +81,17 @@ export function ProgressPage() {
 
       <div className="metric-grid metric-grid-compact">
         <article className="metric-card">
-          <span>Best estimated 1RM</span>
+          <span>{t('bestEstimated1Rm')}</span>
           <strong>
             {progress.bestSession?.bestSet ? Math.round(getEstimated1Rm(progress.bestSession.bestSet)) : '--'}
           </strong>
         </article>
         <article className="metric-card">
-          <span>Total sessions</span>
+          <span>{t('totalSessions')}</span>
           <strong>{progress.totalSessions}</strong>
         </article>
         <article className="metric-card">
-          <span>Current weight</span>
+          <span>{t('currentWeight')}</span>
           <strong>{latestBodyMetric?.bodyWeight ?? '--'}</strong>
         </article>
       </div>
@@ -97,7 +99,7 @@ export function ProgressPage() {
       <div className="panel">
         <div className="section-heading">
           <div>
-            <h2>Momentum</h2>
+            <h2>{t('momentum')}</h2>
             <p className="muted">Use these widgets as your quick-read training dashboard.</p>
           </div>
         </div>
@@ -117,7 +119,7 @@ export function ProgressPage() {
 
       <div className="panel">
         <div className="section-heading">
-          <h2>Volume flow</h2>
+          <h2>{t('volumeFlow')}</h2>
           <span className="muted">Recent load by session</span>
         </div>
         <BarChart data={volumeSeries} />
@@ -125,13 +127,13 @@ export function ProgressPage() {
 
       <div className="panel">
         <div className="section-heading">
-          <h2>Last 10 sessions</h2>
+          <h2>{t('last10Sessions')}</h2>
         </div>
         <div className="sets-table compact-data-table">
           <div className="sets-header">
-            <span>Date</span>
-            <span>Best Set</span>
-            <span>Volume</span>
+            <span>{t('date')}</span>
+            <span>{t('bestSet')}</span>
+            <span>{t('volume')}</span>
             <span>e1RM</span>
           </div>
           {progress.sessions.slice(0, 10).map((session) => (
@@ -145,14 +147,14 @@ export function ProgressPage() {
             </div>
           ))}
           {progress.sessions.length === 0 ? (
-            <p className="muted">No completed sets for this exercise yet.</p>
+            <p className="muted">{t('noCompletedSetsYet')}</p>
           ) : null}
         </div>
       </div>
 
       <div className="panel">
         <div className="section-heading">
-          <h2>Bodyweight</h2>
+          <h2>{t('bodyweight')}</h2>
           <span className="muted">{db.bodyMetrics.length} entries</span>
         </div>
         <form className="inline-form inline-form-weights" onSubmit={handleAddBodyWeight}>
@@ -163,14 +165,14 @@ export function ProgressPage() {
             value={bodyWeight}
             onChange={(event) => setBodyWeight(event.target.value)}
           />
-          <button className="button button-primary">Add weight</button>
+            <button className="button button-primary">{t('addWeight')}</button>
         </form>
         {latestBodyMetric ? (
           <p className="muted">
             Latest check-in: {latestBodyMetric.bodyWeight} on {latestBodyMetric.date}
           </p>
         ) : (
-          <p className="muted">No weigh-ins yet.</p>
+          <p className="muted">{t('noWeighInsYet')}</p>
         )}
         <LineChart data={bodyweightSeries} color="#9dff7a" />
       </div>

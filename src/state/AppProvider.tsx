@@ -41,6 +41,7 @@ type AppContextValue = {
   deleteRoutine: (routineId: ID) => Promise<void>
   addBodyMetric: (entry: Omit<BodyMetricEntry, 'id'>) => Promise<void>
   updateSettings: (patch: Partial<Db['settings']>) => Promise<void>
+  updateLanguage: (language: Db['user']['language']) => Promise<void>
   updateUnitSystem: (unitSystem: Db['user']['unitSystem']) => Promise<void>
   importBackup: (json: string) => Promise<void>
   resetApp: () => Promise<void>
@@ -220,6 +221,16 @@ export function AppProvider({ children }: PropsWithChildren) {
           settings: {
             ...db.settings,
             ...patch,
+          },
+        }
+        await commit(nextDb)
+      },
+      async updateLanguage(language) {
+        const nextDb = {
+          ...db,
+          user: {
+            ...db.user,
+            language,
           },
         }
         await commit(nextDb)

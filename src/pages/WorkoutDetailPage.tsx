@@ -5,12 +5,14 @@ import {
   getWorkout,
   getWorkoutVolume,
 } from '../db/selectors'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 
 export function WorkoutDetailPage() {
   const { workoutId = '' } = useParams()
   const navigate = useNavigate()
   const { db, deleteWorkout } = useAppState()
+  const { t } = useI18n()
   const workout = getWorkout(db, workoutId)
 
   if (!workout) {
@@ -28,9 +30,12 @@ export function WorkoutDetailPage() {
 
   return (
     <section className="screen">
+      <button className="button button-secondary button-inline" onClick={() => navigate('/history')}>
+        ← {t('tabHistory')}
+      </button>
       <header className="page-header">
         <div>
-          <span className="eyebrow">Workout summary</span>
+          <span className="eyebrow">{t('workoutSummary')}</span>
           <h1>{currentWorkout.title || 'Workout'}</h1>
           <p className="muted">
             {new Date(currentWorkout.startedAt).toLocaleString()} · {getSessionDurationMinutes(currentWorkout) ?? '--'} min
@@ -38,22 +43,22 @@ export function WorkoutDetailPage() {
         </div>
         {!currentWorkout.endedAt ? (
           <button className="button button-primary" onClick={() => navigate(`/workout/${currentWorkout.id}`)}>
-            Resume
+            {t('resumeWorkout')}
           </button>
         ) : null}
       </header>
 
       <div className="metric-grid">
         <article className="metric-card">
-          <span>Exercises</span>
+          <span>{t('exercises')}</span>
           <strong>{currentWorkout.exercises.length}</strong>
         </article>
         <article className="metric-card">
-          <span>Total sets</span>
+          <span>{t('totalSets')}</span>
           <strong>{currentWorkout.exercises.reduce((sum, entry) => sum + entry.sets.length, 0)}</strong>
         </article>
         <article className="metric-card">
-          <span>Volume</span>
+          <span>{t('volume')}</span>
           <strong>{Math.round(getWorkoutVolume(currentWorkout))}</strong>
         </article>
       </div>
@@ -70,10 +75,10 @@ export function WorkoutDetailPage() {
               </div>
               <div className="sets-table compact-data-table">
                 <div className="sets-header">
-                  <span>Set</span>
-                  <span>Weight</span>
+                  <span>{t('sets')}</span>
+                  <span>{t('weight')}</span>
                   <span>Reps</span>
-                  <span>Status</span>
+                  <span>{t('status')}</span>
                 </div>
                 {entry.sets.map((set, index) => (
                   <div className="set-row" key={set.id}>
@@ -81,7 +86,7 @@ export function WorkoutDetailPage() {
                     <span>{set.weight ?? '--'}</span>
                     <span>{set.reps ?? '--'}</span>
                     <span className={set.isCompleted ? 'status-complete' : 'status-muted'}>
-                      {set.isCompleted ? 'Done' : 'Skipped'}
+                      {set.isCompleted ? t('completed') : t('skipped')}
                     </span>
                   </div>
                 ))}
@@ -92,7 +97,7 @@ export function WorkoutDetailPage() {
       </div>
 
       <button className="button button-danger" onClick={handleDelete}>
-        Delete workout
+        {t('delete')}
       </button>
     </section>
   )

@@ -1,4 +1,5 @@
 import { exportDb } from '../db/storage'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 
 function downloadTextFile(filename: string, content: string) {
@@ -12,8 +13,9 @@ function downloadTextFile(filename: string, content: string) {
 }
 
 export function SettingsPage() {
-  const { db, setDisplayName, updateSettings, updateUnitSystem, importBackup, resetApp } =
+  const { db, setDisplayName, updateSettings, updateLanguage, updateUnitSystem, importBackup, resetApp } =
     useAppState()
+  const { t, language } = useI18n()
 
   async function handleExport() {
     const json = await exportDb()
@@ -27,7 +29,7 @@ export function SettingsPage() {
     const text = await file.text()
     try {
       await importBackup(text)
-      window.alert('Backup imported successfully.')
+      window.alert(language === 'pl' ? 'Kopia została zaimportowana.' : 'Backup imported successfully.')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Import failed.'
       window.alert(message)
@@ -37,7 +39,7 @@ export function SettingsPage() {
   }
 
   async function handleReset() {
-    const confirmText = window.prompt('Type RESET to clear local data and start fresh.')
+    const confirmText = window.prompt(language === 'pl' ? 'Wpisz RESET, aby wyczyścić dane lokalne.' : 'Type RESET to clear local data and start fresh.')
     if (confirmText !== 'RESET') return
     await resetApp()
   }
@@ -46,31 +48,48 @@ export function SettingsPage() {
     <section className="screen">
       <header className="page-header">
         <div>
-          <span className="eyebrow">Settings</span>
-          <h1>Preferences & backup</h1>
+          <span className="eyebrow">{t('settings')}</span>
+          <h1>{t('preferencesBackup')}</h1>
         </div>
       </header>
 
       <div className="panel">
         <div className="section-heading">
-          <h2>Personal</h2>
+          <h2>{t('personal')}</h2>
         </div>
         <label className="field">
-          <span>Display name</span>
+          <span>{t('displayName')}</span>
           <input
             className="input"
             value={db.user.displayName ?? ''}
             onChange={(event) => void setDisplayName(event.target.value)}
           />
         </label>
+        <div className="settings-row">
+          <span>{t('language')}</span>
+          <div className="segmented">
+            <button
+              className={db.user.language === 'en' ? 'segment segment-active' : 'segment'}
+              onClick={() => void updateLanguage('en')}
+            >
+              EN
+            </button>
+            <button
+              className={db.user.language === 'pl' ? 'segment segment-active' : 'segment'}
+              onClick={() => void updateLanguage('pl')}
+            >
+              PL
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="panel">
         <div className="section-heading">
-          <h2>Training preferences</h2>
+          <h2>{t('trainingPreferences')}</h2>
         </div>
         <div className="settings-row">
-          <span>Weight units</span>
+          <span>{t('weightUnits')}</span>
           <div className="segmented">
             <button
               className={db.user.unitSystem === 'metric' ? 'segment segment-active' : 'segment'}
@@ -88,7 +107,7 @@ export function SettingsPage() {
         </div>
 
         <label className="settings-row">
-          <span>Show RPE</span>
+          <span>{t('showRpe')}</span>
           <input
             type="checkbox"
             checked={db.settings.showRpe}
@@ -97,7 +116,7 @@ export function SettingsPage() {
         </label>
 
         <label className="settings-row">
-          <span>Show estimated 1RM</span>
+          <span>{t('showEstimated1Rm')}</span>
           <input
             type="checkbox"
             checked={db.settings.show1rmEstimate}
@@ -108,18 +127,18 @@ export function SettingsPage() {
 
       <div className="panel">
         <div className="section-heading">
-          <h2>Data</h2>
+          <h2>{t('data')}</h2>
         </div>
         <div className="stack compact-stack">
           <button className="button button-secondary" onClick={handleExport}>
-            Export JSON backup
+            {t('exportJsonBackup')}
           </button>
           <label className="button button-secondary input-button">
-            Import JSON backup
+            {t('importJsonBackup')}
             <input type="file" accept="application/json,.json" onChange={handleImport} />
           </label>
           <button className="button button-danger" onClick={handleReset}>
-            Reset app
+            {t('resetApp')}
           </button>
         </div>
       </div>

@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { getSessionDurationMinutes, getWorkoutVolume } from '../db/selectors'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 
 export function HistoryPage() {
   const { db } = useAppState()
+  const { t } = useI18n()
   const navigate = useNavigate()
 
   const workouts = [...db.workouts].sort(
@@ -14,15 +16,15 @@ export function HistoryPage() {
     <section className="screen">
       <header className="page-header">
         <div>
-          <span className="eyebrow">History</span>
-          <h1>Your sessions</h1>
+          <span className="eyebrow">{t('tabHistory')}</span>
+          <h1>{t('historyTitle')}</h1>
         </div>
       </header>
 
       {workouts.length === 0 ? (
         <div className="panel empty-panel">
-          <h2>No logged workouts yet</h2>
-          <p className="muted">Finish a session and it’ll appear here with duration and volume.</p>
+          <h2>{t('noLoggedWorkouts')}</h2>
+          <p className="muted">{t('noLoggedWorkoutsBody')}</p>
         </div>
       ) : (
         <div className="stack">
@@ -38,21 +40,21 @@ export function HistoryPage() {
                   <p className="muted">{new Date(workout.startedAt).toLocaleString()}</p>
                 </div>
                 <span className={workout.endedAt ? 'pill' : 'pill pill-live'}>
-                  {workout.endedAt ? 'Saved' : 'Active'}
+                  {workout.endedAt ? t('saved') : t('active')}
                 </span>
               </div>
 
               <div className="metric-grid">
                 <article className="metric-card">
-                  <span>Exercises</span>
+                  <span>{t('exercises')}</span>
                   <strong>{workout.exercises.length}</strong>
                 </article>
                 <article className="metric-card">
-                  <span>Duration</span>
+                  <span>{t('duration')}</span>
                   <strong>{getSessionDurationMinutes(workout) ?? '--'}m</strong>
                 </article>
                 <article className="metric-card">
-                  <span>Volume</span>
+                  <span>{t('volume')}</span>
                   <strong>{Math.round(getWorkoutVolume(workout))}</strong>
                 </article>
               </div>

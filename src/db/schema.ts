@@ -1,4 +1,5 @@
 export type ID = string
+export type Language = 'en' | 'pl'
 
 export type UnitSystem = 'metric' | 'imperial'
 
@@ -94,6 +95,7 @@ export type Db = {
   }
   user: {
     displayName?: string
+    language: Language
     unitSystem: UnitSystem
     timezone?: string
   }

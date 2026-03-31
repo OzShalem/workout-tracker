@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { getExercise, getRecentExerciseBest, getWorkout } from '../db/selectors'
 import type { WorkoutSet } from '../db/schema'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 import { createWorkoutExercise, createWorkoutSet } from '../state/workoutFactories'
 
@@ -16,6 +17,7 @@ export function ActiveWorkoutPage() {
   const { workoutId = '' } = useParams()
   const navigate = useNavigate()
   const { db, updateWorkout, finishWorkout } = useAppState()
+  const { t } = useI18n()
   const workout = getWorkout(db, workoutId)
   const startedAt = workout?.startedAt ?? new Date().toISOString()
   const [elapsedMinutes, setElapsedMinutes] = useState(() =>
@@ -98,19 +100,19 @@ export function ActiveWorkoutPage() {
     <section className="screen">
       <header className="page-header">
         <div>
-          <span className="eyebrow">Active workout</span>
+          <span className="eyebrow">{t('activeWorkout')}</span>
           <h1>{currentWorkout.title || 'New Workout'}</h1>
           <p className="muted">{elapsedMinutes} min elapsed</p>
         </div>
         <button className="button button-primary" onClick={handleFinishWorkout}>
-          Finish
+          {t('finish')}
         </button>
       </header>
 
       <div className="panel">
         <div className="stack compact-stack">
           <label className="field">
-            <span>Workout title</span>
+            <span>{t('workoutTitle')}</span>
             <input
               className="input"
               value={currentWorkout.title ?? ''}
@@ -120,7 +122,7 @@ export function ActiveWorkoutPage() {
             />
           </label>
           <label className="field">
-            <span>Notes</span>
+            <span>{t('notes')}</span>
             <input
               className="input"
               placeholder="Sleep, energy, pain, wins..."
@@ -154,7 +156,7 @@ export function ActiveWorkoutPage() {
               </div>
               <div className="inline-actions">
                 <button className="button button-ghost" onClick={() => handleAddSet(entry.id)}>
-                  Add Set
+                  {t('addSet')}
                 </button>
                 <button
                   className="button button-ghost button-danger-text"
@@ -167,7 +169,7 @@ export function ActiveWorkoutPage() {
                     }))
                   }
                 >
-                  Remove
+                  {t('removeExercise')}
                 </button>
               </div>
             </div>
@@ -219,7 +221,7 @@ export function ActiveWorkoutPage() {
 
       <div className="panel">
         <label className="field">
-          <span>Add exercise</span>
+            <span>{t('addExercise')}</span>
           <select
             className="input"
             defaultValue=""
@@ -231,7 +233,7 @@ export function ActiveWorkoutPage() {
               }
             }}
           >
-            <option value="">Choose from your library</option>
+            <option value="">{t('addExercisePrompt')}</option>
             {availableExercises.map((exercise) => (
               <option key={exercise.id} value={exercise.id}>
                 {exercise.name}

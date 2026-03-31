@@ -1,5 +1,5 @@
 import { openDB } from 'idb'
-import { createDefaultDb, seedExercises, seedRoutines } from './defaultDb'
+import { createDefaultDb, detectPreferredLanguage, seedExercises, seedRoutines } from './defaultDb'
 import type { Db } from './schema'
 
 const DB_NAME = 'workout-tracker'
@@ -33,6 +33,10 @@ function isValidDb(value: unknown): value is Db {
 function withSeeds(db: Db): Db {
   return {
     ...db,
+    user: {
+      ...db.user,
+      language: db.user.language ?? detectPreferredLanguage(),
+    },
     exercises: db.exercises.length > 0 ? db.exercises : seedExercises,
     routines: db.routines.length > 0 ? db.routines : seedRoutines,
   }
@@ -55,7 +59,13 @@ export async function loadDb(): Promise<Db> {
     return fallback
   }
 
-  return withSeeds(value)
+  const hydrated = withSeeds(value)
+
+  if (JSON.stringify(hydrated) !== JSON.stringify(value)) {
+    await saveDb(hydrated)
+  }
+
+  return hydrated
 }
 
 export async function saveDb(db: Db): Promise<void> {

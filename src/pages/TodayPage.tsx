@@ -10,10 +10,12 @@ import {
   getWorkoutStreak,
   getWorkoutVolume,
 } from '../db/selectors'
+import { useI18n } from '../i18n/translations'
 import { useAppState } from '../state/AppProvider'
 
 export function TodayPage() {
   const { db, startEmptyWorkout, startWorkoutFromRoutine } = useAppState()
+  const { t, language } = useI18n()
   const navigate = useNavigate()
   const activeWorkout = getActiveWorkout(db)
   const lastWorkout = getLastWorkout(db)
@@ -24,11 +26,11 @@ export function TodayPage() {
   const weeklyCount = getWeeklyWorkoutCount(db)
   const [motivationalLine] = useState(() => {
     const lines = [
-      'Show up and move.',
-      'Small reps, big results.',
-      'Earn today.',
-      'Train like it matters.',
-      'One more set.',
+      language === 'pl' ? 'Po prostu się rusz.' : 'Show up and move.',
+      language === 'pl' ? 'Małe kroki, duże efekty.' : 'Small reps, big results.',
+      language === 'pl' ? 'Zapracuj na dziś.' : 'Earn today.',
+      language === 'pl' ? 'Trenuj jakby to miało znaczenie.' : 'Train like it matters.',
+      language === 'pl' ? 'Jeszcze jedna seria.' : 'One more set.',
     ]
     const dayIndex = Math.floor(Date.now() / 86400000) % lines.length
     return lines[dayIndex]
@@ -51,10 +53,10 @@ export function TodayPage() {
     <section className="screen">
       <header className="page-header">
         <div>
-          <span className="eyebrow">Today</span>
+          <span className="eyebrow">{t('today')}</span>
           <h1>Ready to lift, {db.user.displayName}?</h1>
         </div>
-        <div className="pill pill-live">{activeWorkout ? 'Workout live' : 'Offline ready'}</div>
+        <div className="pill pill-live">{activeWorkout ? t('workoutLive') : t('offlineReady')}</div>
       </header>
 
       <div className="panel panel-hero">
@@ -69,7 +71,7 @@ export function TodayPage() {
             </button>
           ) : (
             <button className="button button-primary" onClick={handleStartEmptyWorkout}>
-              Start Empty Workout
+              {t('startEmptyWorkout')}
             </button>
           )}
           <button
@@ -77,22 +79,22 @@ export function TodayPage() {
             onClick={handleStartRoutine}
             disabled={!firstRoutine}
           >
-            Start from Routine
+            {t('startFromRoutine')}
           </button>
         </div>
       </div>
 
       <div className="glance-grid">
         <article className="glance-card">
-          <span className="eyebrow">Streak</span>
+          <span className="eyebrow">{language === 'pl' ? 'Seria' : 'Streak'}</span>
           <strong>{streak} days</strong>
         </article>
         <article className="glance-card">
-          <span className="eyebrow">This week</span>
+          <span className="eyebrow">{language === 'pl' ? 'Ten tydzień' : 'This week'}</span>
           <strong>{weeklyCount} workouts</strong>
         </article>
         <article className="glance-card glance-card-wide">
-          <span className="eyebrow">Volume</span>
+          <span className="eyebrow">{t('volume')}</span>
           <strong>{weeklyVolume}</strong>
           <p className="muted">
             {latestBodyMetric
@@ -105,12 +107,12 @@ export function TodayPage() {
       {lastWorkout ? (
         <div className="panel">
           <div className="section-heading">
-            <h2>Last Workout</h2>
+            <h2>{t('lastWorkout')}</h2>
             <button
               className="button button-ghost"
               onClick={() => navigate(`/workout/${lastWorkout.id}/detail`)}
             >
-              Open
+              {t('open')}
             </button>
           </div>
           <div className="last-workout-grid">
@@ -123,11 +125,11 @@ export function TodayPage() {
             </div>
             <div className="mini-metric-grid">
               <article className="metric-card">
-                <span>Exercises</span>
+                <span>{t('exercises')}</span>
                 <strong>{lastWorkout.exercises.length}</strong>
               </article>
               <article className="metric-card">
-                <span>Volume</span>
+                <span>{t('volume')}</span>
                 <strong>{Math.round(getWorkoutVolume(lastWorkout))}</strong>
               </article>
             </div>
@@ -135,20 +137,20 @@ export function TodayPage() {
         </div>
       ) : (
         <div className="panel empty-panel">
-          <h2>No sessions yet</h2>
-          <p className="muted">Start your first workout and your history will begin building here.</p>
+          <h2>{t('noSessionsYet')}</h2>
+          <p className="muted">{t('noSessionsBody')}</p>
         </div>
       )}
 
       <div className="panel tip-panel">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Quick launch</span>
-            <h2>Favorite routine</h2>
+            <span className="eyebrow">{t('quickLaunch')}</span>
+            <h2>{t('favoriteRoutine')}</h2>
           </div>
           {firstRoutine ? (
             <button className="button button-ghost" onClick={handleStartRoutine}>
-              Launch
+              {t('launch')}
             </button>
           ) : null}
         </div>

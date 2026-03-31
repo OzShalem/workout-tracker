@@ -46,6 +46,12 @@ export const seedRoutines: RoutineTemplate[] = [
   },
 ]
 
+export function detectPreferredLanguage(): Db['user']['language'] {
+  return typeof navigator !== 'undefined' && navigator.language.toLowerCase().startsWith('pl')
+    ? 'pl'
+    : 'en'
+}
+
 export function createDefaultDb(): Db {
   return {
     schemaVersion: 1,
@@ -54,6 +60,7 @@ export function createDefaultDb(): Db {
       updatedAt: now,
     },
     user: {
+      language: detectPreferredLanguage(),
       unitSystem: 'metric',
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
