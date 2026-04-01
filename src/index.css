@@ -394,6 +394,7 @@ select.input {
 .widget-card {
   background:
     linear-gradient(180deg, rgba(17, 37, 18, 0.96), rgba(13, 29, 15, 0.98));
+  overflow: hidden;
 }
 
 .widget-card-hero {
@@ -642,11 +643,12 @@ select.input {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
 }
 
 .chart-svg {
   width: 100%;
-  height: 140px;
+  height: 118px;
   overflow: visible;
 }
 
@@ -660,10 +662,10 @@ select.input {
 
 .bar-chart {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(24px, 1fr));
   align-items: end;
   gap: 10px;
-  height: 170px;
+  height: 132px;
 }
 
 .bar-column {
@@ -673,12 +675,22 @@ select.input {
   justify-content: end;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  max-width: 44px;
+  justify-self: center;
+}
+
+.bar-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: end;
 }
 
 .bar-fill {
   width: 100%;
-  border-radius: 999px 999px 12px 12px;
-  min-height: 12px;
+  border-radius: 14px 14px 6px 6px;
+  min-height: 10px;
   box-shadow: 0 8px 24px rgba(34, 243, 61, 0.16);
 }
 
@@ -708,6 +720,12 @@ select.input {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+}
+
+.numbers-stack-premium > div {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .numbers-stack strong {
@@ -753,6 +771,86 @@ select.input {
 .inline-form-weights {
   grid-template-columns: 1fr auto;
   align-items: center;
+}
+
+.widget-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.widget-header strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.trend-pill {
+  flex-shrink: 0;
+  min-width: 48px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.trend-pill-positive {
+  background: rgba(34, 243, 61, 0.16);
+  color: #a8ffaf;
+}
+
+.widget-footnote {
+  margin-top: 2px;
+}
+
+.progress-meter {
+  display: grid;
+  gap: 8px;
+}
+
+.progress-meter-track {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.progress-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22f33d, #97ff71);
+  box-shadow: 0 6px 22px rgba(34, 243, 61, 0.2);
+}
+
+.progress-meter-scale {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  align-items: center;
+}
+
+.progress-meter-scale span:nth-child(2) {
+  text-align: center;
+}
+
+.coach-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.coach-notes span {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.76rem;
 }
 
 .settings-row {
@@ -810,6 +908,10 @@ select.input {
 
   .inline-form,
   .inline-form-weights {
+    grid-template-columns: 1fr;
+  }
+
+  .numbers-stack {
     grid-template-columns: 1fr;
   }
 

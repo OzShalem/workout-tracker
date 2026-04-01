@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { motion } from 'motion/react'
-import { BarChart, LineChart } from '../components/Charts'
+import { BarChart, LineChart, ProgressMeter } from '../components/Charts'
 import {
   getBodyweightSeries,
   getEstimated1Rm,
@@ -29,6 +29,25 @@ export function ProgressPage() {
   const latestBodyMetric = getLatestBodyMetric(db)
   const weeklyVolume = Math.round(getWeeklyVolume(db))
   const weeklyCount = getWeeklyWorkoutCount(db)
+  const e1rmSeries = useMemo(
+    () =>
+      progress.sessions
+        .slice(0, 6)
+        .reverse()
+        .map((session) => ({
+          label: new Date(session.workout.startedAt).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+          }),
+          value: Math.round(session.e1rm),
+        })),
+    [progress.sessions],
+  )
+  const latestSession = progress.sessions[0]
+  const previousSession = progress.sessions[1]
+  const momentumDelta = latestSession && previousSession
+    ? Math.round(latestSession.e1rm - previousSession.e1rm)
+    : null
   const nextTarget = useMemo(() => {
     const bestSet = progress.bestSession?.bestSet
     if (!bestSet?.weight) return '--'
@@ -65,23 +84,23 @@ export function ProgressPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28 }}
         >
-          <span className="eyebrow">{t('momentum')}</span>
-          <strong>{progress.bestSession?.bestSet ? Math.round(getEstimated1Rm(progress.bestSession.bestSet)) : '--'}</strong>
+          <div className="widget-header">
+            <div>
+              <span className="eyebrow">{t('momentum')}</span>
+              <strong>{progress.bestSession?.bestSet ? Math.round(getEstimated1Rm(progress.bestSession.bestSet)) : '--'}</strong>
+            </div>
+            <div className={`trend-pill ${momentumDelta && momentumDelta > 0 ? 'trend-pill-positive' : ''}`}>
+              {momentumDelta === null ? '—' : momentumDelta > 0 ? `+${momentumDelta}` : `${momentumDelta}`}
+            </div>
+          </div>
           <p className="muted">
-            {t('bestEstimated1Rm')} · {t('exercise')}
+            {db.user.language === 'pl'
+              ? 'Twój trend siły z ostatnich sesji.'
+              : db.user.language === 'uk'
+                ? 'Твоя силова динаміка за останні сесії.'
+                : 'Your strength trend across recent sessions.'}
           </p>
-          <LineChart
-            data={progress.sessions
-              .slice(0, 6)
-              .reverse()
-              .map((session) => ({
-                label: new Date(session.workout.startedAt).toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                }),
-                value: Math.round(session.e1rm),
-              }))}
-          />
+          <LineChart data={e1rmSeries} />
         </motion.article>
 
         <motion.article
@@ -90,8 +109,10 @@ export function ProgressPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.34 }}
         >
-          <span className="eyebrow">{t('volume')}</span>
-          <div className="numbers-stack">
+          <div className="widget-header">
+            <span className="eyebrow">{t('volume')}</span>
+          </div>
+          <div className="numbers-stack numbers-stack-premium">
             <div>
               <strong>{weeklyVolume}</strong>
               <p className="muted">{t('volume')}</p>
@@ -105,6 +126,13 @@ export function ProgressPage() {
               <p className="muted">{t('currentWeight')}</p>
             </div>
           </div>
+          <p className="muted widget-footnote">
+            {db.user.language === 'pl'
+              ? 'Tydzień w liczbach.'
+              : db.user.language === 'uk'
+                ? 'Тиждень у цифрах.'
+                : 'Your week in numbers.'}
+          </p>
         </motion.article>
 
         <motion.article
@@ -113,16 +141,46 @@ export function ProgressPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <span className="eyebrow">Coach</span>
-          <strong>{nextTarget}</strong>
+          <div className="widget-header">
+            <div>
+              <span className="eyebrow">
+                {db.user.language === 'pl'
+                  ? 'Następny cel'
+                  : db.user.language === 'uk'
+                    ? 'Наступна ціль'
+                    : 'Next target'}
+              </span>
+              <strong>{nextTarget}</strong>
+            </div>
+          </div>
           <p className="muted">
             {db.user.language === 'pl'
-              ? 'Następny cel dla tego ćwiczenia.'
+              ? 'Praktyczna sugestia na kolejny trening tego ćwiczenia.'
               : db.user.language === 'uk'
-                ? 'Наступна ціль для цієї вправи.'
-                : 'Suggested next target for this lift.'}
+                ? 'Практична підказка для наступного тренування цієї вправи.'
+                : 'A practical suggestion for your next session on this lift.'}
           </p>
-          <BarChart data={volumeSeries.slice(-5)} color="linear-gradient(180deg, #8cff5a, #16cd30)" />
+          <ProgressMeter
+            value={latestSession?.e1rm ? Math.round(latestSession.e1rm) : 0}
+            max={progress.bestSession?.e1rm ? Math.round(progress.bestSession.e1rm) : 1}
+            label={db.user.language === 'pl' ? 'top' : db.user.language === 'uk' ? 'пік' : 'peak'}
+          />
+          <div className="coach-notes">
+            <span>
+              {db.user.language === 'pl'
+                ? `Ostatnia objętość: ${Math.round(latestSession?.volume ?? 0)}`
+                : db.user.language === 'uk'
+                  ? `Останній об’єм: ${Math.round(latestSession?.volume ?? 0)}`
+                  : `Last volume: ${Math.round(latestSession?.volume ?? 0)}`}
+            </span>
+            <span>
+              {db.user.language === 'pl'
+                ? `Sesji: ${progress.totalSessions}`
+                : db.user.language === 'uk'
+                  ? `Сесій: ${progress.totalSessions}`
+                  : `Sessions: ${progress.totalSessions}`}
+            </span>
+          </div>
         </motion.article>
       </div>
 
