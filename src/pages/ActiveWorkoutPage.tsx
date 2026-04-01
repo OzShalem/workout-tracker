@@ -13,15 +13,23 @@ function toInputNumber(value: string): number | undefined {
   return parsed
 }
 
+function formatElapsed(totalSeconds: number) {
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  return [hours, minutes, seconds].map((value) => String(value).padStart(2, '0')).join(':')
+}
+
 export function ActiveWorkoutPage() {
   const { workoutId = '' } = useParams()
   const navigate = useNavigate()
-  const { db, updateWorkout, finishWorkout } = useAppState()
+  const { db, updateWorkout, finishWorkout, cancelWorkout } = useAppState()
   const { t } = useI18n()
   const workout = getWorkout(db, workoutId)
   const startedAt = workout?.startedAt ?? new Date().toISOString()
-  const [elapsedMinutes, setElapsedMinutes] = useState(() =>
-    Math.max(1, Math.round((Date.now() - new Date(startedAt).getTime()) / 60000)),
+  const [elapsedSeconds, setElapsedSeconds] = useState(() =>
+    Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)),
   )
 
   const availableExercises = useMemo(
@@ -36,10 +44,10 @@ export function ActiveWorkoutPage() {
     if (!workout) return undefined
 
     const interval = window.setInterval(() => {
-      setElapsedMinutes(
-        Math.max(1, Math.round((Date.now() - new Date(startedAt).getTime()) / 60000)),
+      setElapsedSeconds(
+        Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)),
       )
-    }, 30000)
+    }, 1000)
 
     return () => window.clearInterval(interval)
   }, [startedAt, workout])
@@ -105,18 +113,43 @@ export function ActiveWorkoutPage() {
     navigate('/history')
   }
 
+  async function handleCancelWorkout() {
+    const confirmed = window.confirm(t('cancelWorkoutConfirm'))
+    if (!confirmed) return
+    await cancelWorkout(currentWorkout.id)
+    navigate('/')
+  }
+
   return (
     <section className="screen">
       <header className="page-header">
         <div>
           <span className="eyebrow">{t('activeWorkout')}</span>
           <h1>{currentWorkout.title || 'New Workout'}</h1>
-          <p className="muted">{elapsedMinutes} min elapsed</p>
+          <p className="muted">{formatElapsed(elapsedSeconds)}</p>
         </div>
-        <button className="button button-primary" onClick={handleFinishWorkout}>
-          {t('finish')}
-        </button>
+        <div className="header-actions">
+          <button className="button button-secondary button-header-action" onClick={handleCancelWorkout}>
+            {t('cancelWorkout')}
+          </button>
+          <button className="button button-primary button-header-action" onClick={handleFinishWorkout}>
+            {t('finish')}
+          </button>
+        </div>
       </header>
+
+      <div className="panel panel-live-timer">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">{t('liveTimer')}</span>
+            <div className="timer-watch">{formatElapsed(elapsedSeconds)}</div>
+            <p className="muted">
+              {t('startedAt')} {new Date(currentWorkout.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          </div>
+          <span className="pill pill-live">Live</span>
+        </div>
+      </div>
 
       <div className="panel">
         <div className="stack compact-stack">
@@ -212,7 +245,7 @@ export function ActiveWorkoutPage() {
                     }
                   />
                   <span className={set.isCompleted || set.reps || set.weight ? 'status-complete' : 'status-muted'}>
-                    {set.isCompleted || set.reps || set.weight ? t('completed') : t('skipped')}
+                    {set.isCompleted || set.reps || set.weight ? t('completed') : t('notFinished')}
                   </span>
                 </div>
               ))}

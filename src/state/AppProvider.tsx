@@ -31,6 +31,7 @@ type AppContextValue = {
   startWorkoutFromRoutine: (routineId: ID) => Promise<WorkoutSession | null>
   updateWorkout: (workoutId: ID, updater: (workout: WorkoutSession) => WorkoutSession) => Promise<void>
   finishWorkout: (workoutId: ID) => Promise<void>
+  cancelWorkout: (workoutId: ID) => Promise<void>
   deleteWorkout: (workoutId: ID) => Promise<void>
   addExercise: (exercise: { name: string; category: ExerciseCategory; equipment: Equipment }) => Promise<void>
   updateExercise: (
@@ -145,6 +146,14 @@ export function AppProvider({ children }: PropsWithChildren) {
               ? { ...workout, endedAt: workout.endedAt ?? new Date().toISOString() }
               : workout,
           ),
+        }
+        await commit(nextDb)
+      },
+      async cancelWorkout(workoutId) {
+        const nextDb = {
+          ...db,
+          activeWorkoutId: db.activeWorkoutId === workoutId ? undefined : db.activeWorkoutId,
+          workouts: db.workouts.filter((workout) => workout.id !== workoutId || workout.endedAt),
         }
         await commit(nextDb)
       },

@@ -311,6 +311,11 @@ a {
   text-align: left;
 }
 
+.button-header-action {
+  width: auto;
+  min-width: 132px;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -773,6 +778,29 @@ select.input {
   align-items: center;
 }
 
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.panel-live-timer {
+  background:
+    radial-gradient(circle at top right, rgba(34, 243, 61, 0.16), transparent 28%),
+    linear-gradient(180deg, rgba(15, 39, 18, 0.98), rgba(11, 28, 14, 0.99));
+}
+
+.timer-watch {
+  margin-top: 6px;
+  font-size: clamp(2rem, 10vw, 3rem);
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
 .widget-header {
   display: flex;
   align-items: flex-start;
@@ -909,6 +937,15 @@ select.input {
   .inline-form,
   .inline-form-weights {
     grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .button-header-action {
+    width: 100%;
   }
 
   .numbers-stack {
