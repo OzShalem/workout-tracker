@@ -355,13 +355,15 @@ select.input {
 
 .quick-input-group {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  grid-template-columns: 32px minmax(68px, 1fr) 32px;
   gap: 6px;
   align-items: center;
+  min-width: 0;
 }
 
 .quick-adjust-button {
   min-height: 44px;
+  width: 100%;
   padding: 0;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
@@ -470,6 +472,23 @@ select.input {
   background: rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-md);
   padding: 10px;
+}
+
+.active-sets-header,
+.active-set-row {
+  grid-template-columns: 34px minmax(132px, 1.55fr) 72px minmax(74px, 0.85fr);
+  gap: 8px;
+}
+
+.active-set-row {
+  align-items: stretch;
+}
+
+.active-set-status {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font-size: 0.92rem;
 }
 
 .compact-data-table .sets-header,
@@ -1010,13 +1029,24 @@ select.input {
     white-space: nowrap;
   }
 
+  .active-sets-header,
+  .active-set-row {
+    grid-template-columns: 30px minmax(118px, 1.45fr) 64px minmax(60px, 0.8fr);
+    gap: 6px;
+  }
+
   .quick-input-group {
-    grid-template-columns: 32px minmax(0, 1fr) 32px;
+    grid-template-columns: 28px minmax(60px, 1fr) 28px;
     gap: 4px;
   }
 
   .quick-adjust-button {
     min-height: 42px;
+    font-size: 1rem;
+  }
+
+  .active-set-status {
+    font-size: 0.84rem;
   }
 }
 

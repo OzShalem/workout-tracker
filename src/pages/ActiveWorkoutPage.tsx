@@ -235,14 +235,14 @@ export function ActiveWorkoutPage() {
             </div>
 
             <div className="sets-table">
-              <div className="sets-header">
+              <div className="sets-header active-sets-header">
                 <span>Set</span>
                 <span>Weight</span>
                 <span>Reps</span>
                 <span>Status</span>
               </div>
               {entry.sets.map((set, setIndex) => (
-                <div className="set-row" key={set.id}>
+                <div className="set-row active-set-row" key={set.id}>
                   {(() => {
                     const displayedWeight = set.weight ?? set.targetWeight
                     const displayedReps = set.reps ?? set.targetReps
@@ -293,7 +293,7 @@ export function ActiveWorkoutPage() {
                             void handleUpdateSet(entry.id, set.id, { reps: toInputNumber(event.target.value) })
                           }
                         />
-                        <span className={isLogged ? 'status-complete' : 'status-muted'}>
+                        <span className={`active-set-status ${isLogged ? 'status-complete' : 'status-muted'}`}>
                           {isLogged ? t('completed') : t('notFinished')}
                         </span>
                       </>
