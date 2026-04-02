@@ -444,7 +444,8 @@ select.input {
 }
 
 .exercise-panel {
-  gap: 14px;
+  gap: 10px;
+  padding: 14px 12px;
 }
 
 .sets-table {
@@ -471,24 +472,40 @@ select.input {
 .set-row {
   background: rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-md);
-  padding: 10px;
+  padding: 8px;
 }
 
 .active-sets-header,
 .active-set-row {
-  grid-template-columns: 34px minmax(132px, 1.55fr) 72px minmax(74px, 0.85fr);
-  gap: 8px;
+  grid-template-columns: 28px minmax(126px, 1.6fr) 68px 40px;
+  gap: 6px;
 }
 
 .active-set-row {
   align-items: stretch;
 }
 
-.active-set-status {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  font-size: 0.92rem;
+.active-sets-header {
+  font-size: 0.69rem;
+}
+
+.active-log-button {
+  min-height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.active-log-button:disabled {
+  opacity: 0.5;
+}
+
+.active-log-button-done {
+  background: rgba(34, 243, 61, 0.18);
+  color: #b9ffbc;
 }
 
 .compact-data-table .sets-header,
@@ -557,15 +574,16 @@ select.input {
 .inline-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
 .inline-actions .button {
   width: auto;
-  min-height: 40px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 0.95rem;
 }
 
 .button-inline {
@@ -836,6 +854,7 @@ select.input {
 .routine-prefill-pill {
   justify-content: center;
   align-self: flex-start;
+  margin-top: -6px;
   background: rgba(34, 243, 61, 0.12);
   color: #b9ffbc;
 }
@@ -1031,22 +1050,23 @@ select.input {
 
   .active-sets-header,
   .active-set-row {
-    grid-template-columns: 30px minmax(118px, 1.45fr) 64px minmax(60px, 0.8fr);
-    gap: 6px;
-  }
-
-  .quick-input-group {
-    grid-template-columns: 28px minmax(60px, 1fr) 28px;
+    grid-template-columns: 24px minmax(112px, 1.55fr) 60px 34px;
     gap: 4px;
   }
 
-  .quick-adjust-button {
-    min-height: 42px;
-    font-size: 1rem;
+  .quick-input-group {
+    grid-template-columns: 24px minmax(56px, 1fr) 24px;
+    gap: 3px;
   }
 
-  .active-set-status {
-    font-size: 0.84rem;
+  .quick-adjust-button {
+    min-height: 38px;
+    font-size: 0.95rem;
+  }
+
+  .active-log-button {
+    min-height: 38px;
+    font-size: 0.92rem;
   }
 }
 

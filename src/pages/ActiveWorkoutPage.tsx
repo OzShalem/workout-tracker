@@ -127,6 +127,14 @@ export function ActiveWorkoutPage() {
     navigate('/history')
   }
 
+  async function handleUsePrefill(exerciseEntryId: string, setId: string, set: WorkoutSet) {
+    await handleUpdateSet(exerciseEntryId, setId, {
+      weight: set.weight ?? set.targetWeight,
+      reps: set.reps ?? set.targetReps,
+      isCompleted: true,
+    })
+  }
+
   async function handleCancelWorkout() {
     const confirmed = window.confirm(t('cancelWorkoutConfirm'))
     if (!confirmed) return
@@ -239,7 +247,7 @@ export function ActiveWorkoutPage() {
                 <span>Set</span>
                 <span>Weight</span>
                 <span>Reps</span>
-                <span>Status</span>
+                <span>Log</span>
               </div>
               {entry.sets.map((set, setIndex) => (
                 <div className="set-row active-set-row" key={set.id}>
@@ -247,6 +255,9 @@ export function ActiveWorkoutPage() {
                     const displayedWeight = set.weight ?? set.targetWeight
                     const displayedReps = set.reps ?? set.targetReps
                     const isLogged = set.isCompleted || typeof set.reps === 'number' || typeof set.weight === 'number'
+                    const canUsePrefill =
+                      !isLogged &&
+                      (typeof set.targetWeight === 'number' || typeof set.targetReps === 'number')
 
                     return (
                       <>
@@ -293,9 +304,15 @@ export function ActiveWorkoutPage() {
                             void handleUpdateSet(entry.id, set.id, { reps: toInputNumber(event.target.value) })
                           }
                         />
-                        <span className={`active-set-status ${isLogged ? 'status-complete' : 'status-muted'}`}>
-                          {isLogged ? t('completed') : t('notFinished')}
-                        </span>
+                        <button
+                          type="button"
+                          className={`active-log-button ${isLogged ? 'active-log-button-done' : ''}`}
+                          onClick={() => void handleUsePrefill(entry.id, set.id, set)}
+                          disabled={!canUsePrefill}
+                          aria-label={isLogged ? t('completed') : canUsePrefill ? 'Use target' : t('notFinished')}
+                        >
+                          {isLogged ? '✓' : canUsePrefill ? '↺' : '—'}
+                        </button>
                       </>
                     )
                   })()}
