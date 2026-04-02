@@ -21,6 +21,10 @@ function formatElapsed(totalSeconds: number) {
   return [hours, minutes, seconds].map((value) => String(value).padStart(2, '0')).join(':')
 }
 
+function adjustNumber(current: number | undefined, delta: number) {
+  return Math.max(0, Number(((current ?? 0) + delta).toFixed(2)))
+}
+
 export function ActiveWorkoutPage() {
   const { workoutId = '' } = useParams()
   const navigate = useNavigate()
@@ -61,6 +65,16 @@ export function ActiveWorkoutPage() {
   }
 
   const currentWorkout = workout
+  const weightStep = db.user.unitSystem === 'metric' ? 1 : 2.5
+  const hasRoutineHistory = Boolean(
+    currentWorkout.routineId &&
+      db.workouts.some(
+        (session) =>
+          session.id !== currentWorkout.id &&
+          session.endedAt &&
+          session.routineId === currentWorkout.routineId,
+      ),
+  )
 
   async function handleAddExercise(exerciseId: string) {
     if (!exerciseId) return
@@ -151,6 +165,10 @@ export function ActiveWorkoutPage() {
         </div>
       </div>
 
+      {hasRoutineHistory ? (
+        <div className="pill routine-prefill-pill">{t('previousSessionLoaded')}</div>
+      ) : null}
+
       <div className="panel">
         <div className="stack compact-stack">
           <label className="field">
@@ -225,28 +243,62 @@ export function ActiveWorkoutPage() {
               </div>
               {entry.sets.map((set, setIndex) => (
                 <div className="set-row" key={set.id}>
-                  <span className="set-index">{setIndex + 1}</span>
-                  <input
-                    className="input input-inline"
-                    inputMode="decimal"
-                    placeholder="0"
-                    value={set.weight ?? ''}
-                    onChange={(event) =>
-                      void handleUpdateSet(entry.id, set.id, { weight: toInputNumber(event.target.value) })
-                    }
-                  />
-                  <input
-                    className="input input-inline"
-                    inputMode="numeric"
-                    placeholder="0"
-                    value={set.reps ?? ''}
-                    onChange={(event) =>
-                      void handleUpdateSet(entry.id, set.id, { reps: toInputNumber(event.target.value) })
-                    }
-                  />
-                  <span className={set.isCompleted || set.reps || set.weight ? 'status-complete' : 'status-muted'}>
-                    {set.isCompleted || set.reps || set.weight ? t('completed') : t('notFinished')}
-                  </span>
+                  {(() => {
+                    const displayedWeight = set.weight ?? set.targetWeight
+                    const displayedReps = set.reps ?? set.targetReps
+                    const isLogged = set.isCompleted || typeof set.reps === 'number' || typeof set.weight === 'number'
+
+                    return (
+                      <>
+                        <span className="set-index">{setIndex + 1}</span>
+                        <div className="quick-input-group">
+                          <button
+                            type="button"
+                            className="button quick-adjust-button"
+                            onClick={() =>
+                              void handleUpdateSet(entry.id, set.id, {
+                                weight: adjustNumber(displayedWeight, -weightStep),
+                              })
+                            }
+                          >
+                            -
+                          </button>
+                          <input
+                            className={`input input-inline ${set.targetWeight !== undefined && set.weight === undefined ? 'input-prefill' : ''}`}
+                            inputMode="decimal"
+                            placeholder="0"
+                            value={displayedWeight ?? ''}
+                            onChange={(event) =>
+                              void handleUpdateSet(entry.id, set.id, { weight: toInputNumber(event.target.value) })
+                            }
+                          />
+                          <button
+                            type="button"
+                            className="button quick-adjust-button"
+                            onClick={() =>
+                              void handleUpdateSet(entry.id, set.id, {
+                                weight: adjustNumber(displayedWeight, weightStep),
+                              })
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
+                        <input
+                          className={`input input-inline ${set.targetReps !== undefined && set.reps === undefined ? 'input-prefill' : ''}`}
+                          inputMode="numeric"
+                          placeholder="0"
+                          value={displayedReps ?? ''}
+                          onChange={(event) =>
+                            void handleUpdateSet(entry.id, set.id, { reps: toInputNumber(event.target.value) })
+                          }
+                        />
+                        <span className={isLogged ? 'status-complete' : 'status-muted'}>
+                          {isLogged ? t('completed') : t('notFinished')}
+                        </span>
+                      </>
+                    )
+                  })()}
                 </div>
               ))}
             </div>

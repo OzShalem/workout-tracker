@@ -91,6 +91,12 @@ export function getLastWorkout(db: Db): WorkoutSession | undefined {
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0]
 }
 
+export function getLastCompletedRoutineWorkout(db: Db, routineId: ID): WorkoutSession | undefined {
+  return [...db.workouts]
+    .filter((workout) => workout.endedAt && workout.routineId === routineId)
+    .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0]
+}
+
 export function getLatestBodyMetric(db: Db): BodyMetricEntry | undefined {
   return [...db.bodyMetrics].sort((a, b) => b.date.localeCompare(a.date))[0]
 }

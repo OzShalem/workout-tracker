@@ -41,6 +41,8 @@ export type WorkoutSet = {
   type: 'warmup' | 'working' | 'drop' | 'failure' | 'amrap'
   reps?: number
   weight?: number
+  targetReps?: number
+  targetWeight?: number
   rpe?: number
   isCompleted: boolean
   createdAt: string

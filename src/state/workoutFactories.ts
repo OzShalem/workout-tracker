@@ -4,12 +4,13 @@ function createId() {
   return crypto.randomUUID()
 }
 
-export function createWorkoutSet(): WorkoutSet {
+export function createWorkoutSet(preset?: Partial<WorkoutSet>): WorkoutSet {
   return {
     id: createId(),
     type: 'working',
     isCompleted: false,
     createdAt: new Date().toISOString(),
+    ...preset,
   }
 }
 

@@ -7,6 +7,7 @@ import {
   type PropsWithChildren,
 } from 'react'
 import { createDefaultDb } from '../db/defaultDb'
+import { getLastCompletedRoutineWorkout } from '../db/selectors'
 import { importDb, loadDbWithStatus, repairDb, resetDb, saveDb } from '../db/storage'
 import {
   createEmptySession,
@@ -104,6 +105,7 @@ export function AppProvider({ children }: PropsWithChildren) {
       async startWorkoutFromRoutine(routineId) {
         const routine = db.routines.find((item) => item.id === routineId)
         if (!routine) return null
+        const lastRoutineWorkout = getLastCompletedRoutineWorkout(db, routine.id)
 
         const workout: WorkoutSession = {
           id: crypto.randomUUID(),
@@ -112,12 +114,29 @@ export function AppProvider({ children }: PropsWithChildren) {
           routineId: routine.id,
           exercises: routine.exerciseBlocks
             .sort((a, b) => a.order - b.order)
-            .map((block, index) => ({
-              id: crypto.randomUUID(),
-              exerciseId: block.exerciseId,
-              order: index,
-              sets: Array.from({ length: block.suggestedSets ?? 1 }, () => createWorkoutSet()),
-            })),
+            .map((block, index) => {
+              const previousEntry = lastRoutineWorkout?.exercises.find(
+                (entry) => entry.exerciseId === block.exerciseId,
+              )
+              const previousSets = previousEntry?.sets ?? []
+              const targetSetCount = Math.max(block.suggestedSets ?? 0, previousSets.length, 1)
+              return {
+                id: crypto.randomUUID(),
+                exerciseId: block.exerciseId,
+                order: index,
+                sets: Array.from({ length: targetSetCount }, (_, setIndex) => {
+                  const previousSet = previousSets[setIndex]
+
+                  return createWorkoutSet({
+                    type: previousSet?.type ?? 'working',
+                    targetReps: previousSet?.reps,
+                    targetWeight: previousSet?.weight,
+                    rpe: previousSet?.rpe,
+                    isCompleted: false,
+                  })
+                }),
+              }
+            }),
         }
 
         const nextDb = {
